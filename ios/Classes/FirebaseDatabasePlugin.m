@@ -26,7 +26,8 @@
     FlutterMethodChannel *channel = [FlutterMethodChannel
                                      methodChannelWithName:@"firebase_database"
                                      binaryMessenger:flutterView];
-    [[FIRDatabase database].reference observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+    [[[FIRDatabase database].reference queryLimitedToLast:10]
+     observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
       [channel invokeMethod:@"DatabaseReference#childAdded" arguments:@[snapshot.value]];
     }];
     [channel setMethodCallHandler:^(FlutterMethodCall *call,
