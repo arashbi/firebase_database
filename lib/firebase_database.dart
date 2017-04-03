@@ -15,8 +15,6 @@ class FirebaseDatabase {
       const PlatformMethodChannel('firebase_database');
 
   FirebaseDatabase() {
-    // Add fake data to the database
-//    new Timer(delay, _addFakeData);
     _channel.setMethodCallHandler((MethodCall call) {
       if (call.method == "DatabaseReference#childAdded") {
         Event event = new Event(call.arguments[0]);
@@ -25,28 +23,13 @@ class FirebaseDatabase {
     });
   }
 
-//  void _addFakeData() {
-//    DatabaseReference._childAdded.add(new Event({
-//      'sender': {
-//        'name': 'Collin Jackson',
-//      },
-//      'text': 'Hello',
-//    }));
-//    DatabaseReference._childAdded.add(new Event({
-//      'sender': {
-//        'name': 'Seth Ladd',
-//      },
-//      'imageUrl': 'https://s-media-cache-ak0.pinimg.com/736x/fd/a9/49/fda94957d5907ca90653da6f0991b7da.jpg',
-//    }));
-//  }
-
   static FirebaseDatabase _instance = new FirebaseDatabase();
   static FirebaseDatabase get instance => _instance;
   DatabaseReference reference() => new DatabaseReference();
 }
 
 class DatabaseReference {
-  static StreamController<Event> _childAdded = new StreamController<Event>();
+  static StreamController<Event> _childAdded = new StreamController<Event>.broadcast();
   Stream<Event> get onChildAdded => _childAdded.stream;
   DatabaseReference push() => new DatabaseReference();
   Future set(Map<String, dynamic> value) async {

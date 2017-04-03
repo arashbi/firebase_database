@@ -20,22 +20,28 @@
 - (instancetype)initWithFlutterView:(FlutterViewController *)flutterView {
   self = [super init];
   if (self) {
-    //[FIRApp configure];
+    if (![FIRApp defaultApp]) {
+      [FIRApp configure];
+    }
     FlutterMethodChannel *channel = [FlutterMethodChannel
                                      methodChannelWithName:@"firebase_database"
                                      binaryMessenger:flutterView];
+    [[FIRDatabase database].reference observeEventType:FIRDataEventTypeChildAdded withBlock:^(FIRDataSnapshot * _Nonnull snapshot) {
+      [channel invokeMethod:@"DatabaseReference#childAdded" arguments:@[snapshot.value]];
+    }];
     [channel setMethodCallHandler:^(FlutterMethodCall *call,
                                     FlutterResultReceiver result) {
       if ([@"DatabaseReference#set" isEqualToString:call.method]) {
         NSDictionary *data = call.arguments[0];
-//        [[[FIRDatabase database].reference childByAutoId] updateChildValues:data
-//         withCompletionBlock:^(NSError * _Nullable error, FIRDatabaseReference * _Nonnull ref) {
-//             if (error != nil) {
-//               result(error.flutterError);
-//             } else {
-//               result(nil);
-//             }
-//         }];
+        FIRDatabaseReference *ref = [[FIRDatabase database].reference childByAutoId];
+        [ref updateChildValues:data
+         withCompletionBlock:^(NSError * _Nullable error, FIRDatabaseReference * _Nonnull ref) {
+             if (error != nil) {
+               result(error.flutterError);
+             } else {
+               result(nil);
+             }
+         }];
       }
     }];
   }
