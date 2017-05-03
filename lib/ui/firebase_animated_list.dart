@@ -4,7 +4,6 @@
 
 import 'dart:async';
 import '../firebase_database.dart';
-import 'firebase_list.dart';
 import 'package:flutter/material.dart';
 
 typedef Widget FirebaseAnimatedListItemBuilder(
