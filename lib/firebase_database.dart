@@ -6,19 +6,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// Temporary stubs while we build out a PlatformMessages-based implementation.
-
-const Duration delay = const Duration(seconds: 1);
-
 class FirebaseDatabase {
-  static const PlatformMethodChannel _channel =
-      const PlatformMethodChannel('firebase_database');
+  static const MethodChannel _channel =
+      const MethodChannel('firebase_database');
 
   FirebaseDatabase() {
+    // stub implementation
     _channel.setMethodCallHandler((MethodCall call) {
       if (call.method == "DatabaseReference#childAdded") {
-        Event event = new Event(call.arguments[0]);
-        DatabaseReference._childAdded.add(event);
+        Event event = new Event._(call.arguments[0], call.arguments[1]);
+        Query._childAdded.add(event);
       }
     });
   }
@@ -28,10 +25,16 @@ class FirebaseDatabase {
   DatabaseReference reference() => new DatabaseReference();
 }
 
-class DatabaseReference {
+class Query {
+  // stub implementation
   static StreamController<Event> _childAdded = new StreamController<Event>.broadcast();
   Stream<Event> get onChildAdded => _childAdded.stream;
-  DatabaseReference push() => new DatabaseReference();
+}
+
+class DatabaseReference extends Query {
+  DatabaseReference push() => new DatabaseReference();   // stub implementation
+  DatabaseReference child(String name) => new DatabaseReference();  // stub implementation
+
   Future set(Map<String, dynamic> value) async {
     await FirebaseDatabase._channel.invokeMethod(
       "DatabaseReference#set",
@@ -41,23 +44,13 @@ class DatabaseReference {
   }
 }
 
-class FirebaseAuth {
-  static FirebaseAuth get instance => new FirebaseAuth();
-  Future signInAnonymously() {
-    return new Future.value(<String, dynamic>{});
-  }
-}
-
 class Event {
-  Event(dynamic val) : snapshot = new DataSnapshot(val);
+  Event._(String key, dynamic value) : snapshot = new DataSnapshot(key, value);
   final DataSnapshot snapshot;
 }
 
 class DataSnapshot {
-  dynamic _val;
-  DataSnapshot(this._val);
-  dynamic val() => _val;
-}
-
-class FirebaseMessaging {
+  final String key;
+  final dynamic value;
+  DataSnapshot(this.key, this.value);
 }
