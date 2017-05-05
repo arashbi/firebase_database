@@ -9,7 +9,7 @@
     // Override point for customization after application launch.
   FlutterViewController *flutterController =
       (FlutterViewController *)self.window.rootViewController;
-  _firebase_database = [[FirebaseDatabasePlugin alloc] initWithFlutterView:flutterController];
+  _firebase_database = [[FirebaseDatabasePlugin alloc] initWithController:flutterController];
     return YES;
 }
 

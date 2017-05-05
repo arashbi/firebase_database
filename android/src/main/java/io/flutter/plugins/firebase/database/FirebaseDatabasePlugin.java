@@ -10,9 +10,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.ChildEventListener;
 
 import io.flutter.app.FlutterActivity;
-import io.flutter.plugin.common.FlutterMethodChannel;
-import io.flutter.plugin.common.FlutterMethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.FlutterMethodChannel.Response;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.MethodCall;
 
 import java.util.Arrays;
@@ -24,15 +24,15 @@ import java.util.Map;
  */
 public class FirebaseDatabasePlugin implements MethodCallHandler {
   private FlutterActivity activity;
-  private FlutterMethodChannel channel;
+  private MethodChannel channel;
 
-  public static void register(FlutterActivity activity) {
-    new FirebaseDatabasePlugin(activity);
+  public static FirebaseDatabasePlugin register(FlutterActivity activity) {
+    return new FirebaseDatabasePlugin(activity);
   }
 
   private FirebaseDatabasePlugin(FlutterActivity activity) {
     this.activity = activity;
-    this.channel = new FlutterMethodChannel(activity.getFlutterView(), "firebase_database");
+    this.channel = new MethodChannel(activity.getFlutterView(), "firebase_database");
     channel.setMethodCallHandler(this);
     FirebaseDatabase.getInstance().getReference().limitToLast(10).addChildEventListener(new ChildEventListener() {
       @Override
@@ -40,7 +40,7 @@ public class FirebaseDatabasePlugin implements MethodCallHandler {
       }
       @Override
       public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-        List arguments = Arrays.asList(snapshot.getValue());
+        List arguments = Arrays.asList(snapshot.getKey(), snapshot.getValue());
         channel.invokeMethod("DatabaseReference#childAdded", arguments);
       }
       @Override
@@ -56,7 +56,7 @@ public class FirebaseDatabasePlugin implements MethodCallHandler {
   }
 
   @Override
-  public void onMethodCall(MethodCall call, final Response response) {
+  public void onMethodCall(MethodCall call, final Result result) {
     if (call.method.equals("DatabaseReference#set")) {
       List arguments = (List) call.arguments;
       Map data = (Map) arguments.get(0);
@@ -65,14 +65,14 @@ public class FirebaseDatabasePlugin implements MethodCallHandler {
         @Override
         public void onComplete(DatabaseError error, DatabaseReference ref) {
           if (error != null) {
-            response.error(String.valueOf(error.getCode()), error.getMessage(), error.getDetails());
+            result.error(String.valueOf(error.getCode()), error.getMessage(), error.getDetails());
           } else {
-            response.success(null);
+            result.success(null);
           }
         }
       });
     } else {
-      response.notImplemented();
+      result.notImplemented();
     }
   }
 }
