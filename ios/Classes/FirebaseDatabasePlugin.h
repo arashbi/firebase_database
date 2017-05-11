@@ -1,5 +1,4 @@
 #import <Flutter/Flutter.h>
 
-@interface FirebaseDatabasePlugin : NSObject
-- initWithController:(FlutterViewController *)flutterView;
+@interface FirebaseDatabasePlugin : NSObject<FlutterPlugin>
 @end

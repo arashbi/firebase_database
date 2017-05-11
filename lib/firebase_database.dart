@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 
 class FirebaseDatabase {
   static const MethodChannel _channel =
-      const MethodChannel('firebase_database');
+      const MethodChannel('plugins.flutter.io/firebase_database');
 
   FirebaseDatabase() {
     // stub implementation
