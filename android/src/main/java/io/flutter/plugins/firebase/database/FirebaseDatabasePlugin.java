@@ -1,19 +1,16 @@
 package io.flutter.plugins.firebase.database;
 
-import android.util.Log;
-
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.ChildEventListener;
 
-import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.PluginRegistry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,17 +20,13 @@ import java.util.Map;
  * FirebaseDatabasePlugin
  */
 public class FirebaseDatabasePlugin implements MethodCallHandler {
-  private FlutterActivity activity;
-  private MethodChannel channel;
 
-  public static FirebaseDatabasePlugin register(FlutterActivity activity) {
-    return new FirebaseDatabasePlugin(activity);
+  public static void registerWith(PluginRegistry.Registrar registrar) {
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/firebase_database");
+    channel.setMethodCallHandler(new FirebaseDatabasePlugin(channel));
   }
 
-  private FirebaseDatabasePlugin(FlutterActivity activity) {
-    this.activity = activity;
-    this.channel = new MethodChannel(activity.getFlutterView(), "firebase_database");
-    channel.setMethodCallHandler(this);
+  private FirebaseDatabasePlugin(final MethodChannel channel) {
     FirebaseDatabase.getInstance().getReference().limitToLast(10).addChildEventListener(new ChildEventListener() {
       @Override
       public void onCancelled(DatabaseError error) {
